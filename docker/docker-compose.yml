@@ -7,6 +7,7 @@ networks:
 
 volumes:
   minio_data:
+  db_data_minio:
 
 services:
   minio:
@@ -21,6 +22,35 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    networks:
+        - app_minio
+
+  mysql_minio:
+      image: mysql:latest
+      container_name: mysql_minio
+      restart: unless-stopped
+      tty: true
+      ports:
+          - "3306"
+      deploy:
+          resources:
+              limits:
+                  cpus: '2'
+                  memory: 4096M
+              reservations:
+                  cpus: '1'
+                  memory: 512M
+      volumes:
+          - db_data_minio:/var/lib/mysql
+      environment:
+          MYSQL_DATABASE: ${DB_DATABASE}
+          MYSQL_USER: ${DB_USERNAME}
+          MYSQL_PASSWORD: ${DB_PASSWORD}
+          MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+          SERVICE_TAGS: dev
+          SERVICE_NAME: ${DB_CONNECTION}
+      networks:
+          - app_minio
 
   app_minio:
     build:
@@ -43,7 +73,9 @@ services:
           memory: 128M
     depends_on:
       - minio
+      - mysql_minio
     external_links:
       - minio
+      - mysql_minio
     networks:
       - app_minio
