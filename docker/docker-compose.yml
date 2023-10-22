@@ -1,0 +1,49 @@
+version: '3'
+
+networks:
+  app_minio:
+    name: app_minio
+    driver: bridge
+
+volumes:
+  minio_data:
+
+services:
+  minio:
+    container_name: minio
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio99
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  app_minio:
+    build:
+      context: ../
+      dockerfile: docker/app/Dockerfile
+    container_name: app_minio
+    restart: unless-stopped
+    volumes:
+      - ../:/var/www/html
+      - ./supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    ports:
+      - "8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.50'
+          memory: 128M
+    depends_on:
+      - minio
+    external_links:
+      - minio
+    networks:
+      - app_minio
