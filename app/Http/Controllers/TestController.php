@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class TestController extends Controller
 {
@@ -22,7 +23,12 @@ class TestController extends Controller
                 ->toMediaCollection('avatar');
         }
 
-        dd($user);
+        $user->getMedia('avatar')->each(function (Media $media){
+            echo "<img src=\"{$media->getTemporaryUrl(now()->addMinutes(5))}\">";
+        });
+
+
+        dd($user,);
 
     }
 }
