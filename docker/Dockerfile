@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libmcrypt-dev \
+    libgd-dev \
+    jpegoptim optipng pngquant gifsicle \
     zip \
     unzip \
     supervisor \
@@ -21,7 +27,10 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml zip soap sockets init
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml zip soap sockets
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) gd
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -33,8 +42,8 @@ WORKDIR /var/www/html
 COPY ./ /var/www/html
 
 # Copy supervisor config and entrypoint script
-COPY docker/app/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/app/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Make entrypoint script executable and run it on container start-up.
 RUN chmod +x /usr/local/bin/entrypoint.sh

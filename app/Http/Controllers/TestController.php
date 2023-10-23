@@ -18,15 +18,14 @@ class TestController extends Controller
             ]);
         });
 
-        if(!$user->getMedia('avatar')->first()) {
-            $user->addMediaFromUrl('https://www.clipartmax.com/png/middle/319-3191274_male-avatar-admin-profile.png')
+        $user->addMediaFromUrl('https://www.clipartmax.com/png/middle/319-3191274_male-avatar-admin-profile.png')
                 ->toMediaCollection('avatar');
-        }
+
 
         $user->getMedia('avatar')->each(function (Media $media){
-            echo "<img src=\"{$media->getTemporaryUrl(now()->addMinutes(5))}\">";
+            echo "<img src=\"{$media->getTemporaryUrl(now()->addMinutes(), 'thumb')}\">";
+//            $media->delete();
         });
-
 
         dd($user,);
 

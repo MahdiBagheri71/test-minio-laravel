@@ -55,7 +55,7 @@ services:
   app_minio:
     build:
       context: ../
-      dockerfile: docker/app/Dockerfile
+      dockerfile: docker/Dockerfile
     container_name: app_minio
     restart: unless-stopped
     volumes:

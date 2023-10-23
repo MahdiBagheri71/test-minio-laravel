@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\File;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * App\Models\User
@@ -76,4 +78,23 @@ class User extends Authenticatable implements  HasMedia
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->acceptsMimeTypes(['image/jpeg','image/png','image/gif','image/jpg'])
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                $this
+                    ->addMediaConversion('thumb')
+                    ->width(50)
+                    ->height(50);
+
+                $this
+                    ->addMediaConversion('thumb_2')
+                    ->width(100)
+                    ->height(100);
+            });
+    }
 }
