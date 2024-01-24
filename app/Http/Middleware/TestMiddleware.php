@@ -9,10 +9,10 @@ use Psy\Exception\ThrowUpException;
 class TestMiddleware
 {
 
-    public function handle(Request $request, Closure $next, string $p1 , string $p2=null)
+    public function handle(Request $request, Closure $next, string $p1 =null, string $p2=null)
     {
-        if ($p1==='Mahdi' && $p2 ==='Bagheri'){
-            return abort(403);
+        if ($p1 && $p2){
+            return abort(403,"{$p1} {$p2}");
         }
         return $next($request);
     }
