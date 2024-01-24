@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,4 +19,9 @@ Route::get('/', function () {
 });
 
 
-Route::get('/test', [\App\Http\Controllers\TestController::class, 'index'])->name('test');
+Route::get('/test', [TestController::class, 'index'])->name('test');
+Route::get('/test-middleware', [TestController::class, 'index'])
+    ->middleware([
+        'test:Mahdi,Bagheri'
+    ])
+    ->name('test-middleware');
